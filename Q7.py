@@ -1,6 +1,6 @@
 import numpy as np
 import math
-import scipy.stats
+from scipy.stats import chi2
 import matplotlib.pyplot as plt
 
 INTERARRIVAL_MEAN = 1
@@ -94,12 +94,16 @@ def chi_square(observed, expected):
 
 	print "Degrees of freedom: " + str(dof)
 	print "Chi-Square: " + str(result)
-	print "Test Value: " + str(CHI_SQUARE_VALUES[dof - 1])
-	if (result < CHI_SQUARE_VALUES[dof - 1]):
+	print "Test Value: " + str(chi2.isf(0.05, dof))
+	if (result < chi2.isf(0.05, dof)):
 		print "TEST PASSED"
 	else:
 		print "TEST FAILED"
 
+def expected_value(upper_limit, lower_limit, rate):
+	upper_prob = 1 - math.exp(-1.0 * rate * upper_limit)
+	lower_prob = 1 - math.exp(-1.0 * rate * lower_limit)
+	return MAX_DEPARTURES * (upper_prob - lower_prob)
 
 run_sim()
 
@@ -134,19 +138,26 @@ waiting_time = []
 for i in range(len(arrival_times)):
 	waiting_time.append(departure_times[i] - arrival_times[i])
 
-# freq, bins = np.histogram(waiting_time, 32)
-# for i in range(len(freq)):
-# 	print "BIN: " + str(bins[i]) + " FREQ: " + str(freq[i])
+freq, bins = np.histogram(waiting_time, 32)
+for i in range(len(freq)):
+	print "BIN: " + str(bins[i]) + " FREQ: " + str(freq[i])
 
-# expected = []
-# for i in range(len(freq)):
-# 	expected.append(MAX_DEPARTURES * SERVICE_MEAN * (math.exp((-1.0/SERVICE_MEAN) * bins[i])))
-# print expected
+waiting_time_rate = float(len(waiting_time)) / float(sum(waiting_time))
 
-# chi_square(freq.tolist(), expected)
+bin_diff = bins[1] - bins[0]
 
-# plt.hist(waiting_time, 32)
-# plt.xlabel("WAITING TIME OF PACKET")
-# plt.ylabel("FREQUENCY OF WAITING TIME")
-# plt.title("Waiting Time")
-# plt.show()
+expected = []
+for i in range(len(freq)):
+	expected.append(expected_value(bins[i] + bin_diff, bins[i], waiting_time_rate))
+	
+print expected
+print sum(expected)
+print len(freq)
+
+chi_square(freq.tolist(), expected)
+
+plt.hist(waiting_time, 32)
+plt.xlabel("WAITING TIME OF PACKET")
+plt.ylabel("FREQUENCY OF WAITING TIME")
+plt.title("Waiting Time")
+plt.show()
