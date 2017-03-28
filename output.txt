@@ -1,0 +1,12 @@
+-------System Occupancy -------
+Server Utilization: 0.63
+Degrees of freedom: 9
+Chi-Square: 31.656199041
+Test Value: 16.9189776046
+TEST FAILED
+------- Wait Time -------
+Mean Waiting Time: 1.38613756158
+Degrees of freedom: 21
+Chi-Square: 26.7928242256
+Test Value: 32.6705733409
+TEST PASSED

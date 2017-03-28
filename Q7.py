@@ -107,6 +107,7 @@ def expected_value(upper_limit, lower_limit, rate):
 
 run_sim()
 
+print "------- System Occupancy -------"
 occupancy_frequency = []
 num_bins = 0
 for i in range(0, max(occupancy) + 1):
@@ -128,19 +129,14 @@ print "Server Utilization: " + str(server_utilization)
 
 chi_square(occupancy_frequency, expected_frequency)
 
-# plt.hist(occupancy, num_bins)
-# plt.xlabel("PACKET OCCUPANCY OF SYSTEM ON NEW ARRIVAL")
-# plt.ylabel("FREQUENCY OF OCCUPANCY")
-# plt.title("System Occupancy")
-# plt.show()
-
+print "------- Wait Time -------"
 waiting_time = []
 for i in range(len(arrival_times)):
 	waiting_time.append(departure_times[i] - arrival_times[i])
 
 freq, bins = np.histogram(waiting_time, 32)
-for i in range(len(freq)):
-	print "BIN: " + str(bins[i]) + " FREQ: " + str(freq[i])
+# for i in range(len(freq)):
+# 	print "BIN: " + str(bins[i]) + " FREQ: " + str(freq[i])
 
 waiting_time_rate = float(len(waiting_time)) / float(sum(waiting_time))
 
@@ -149,12 +145,16 @@ bin_diff = bins[1] - bins[0]
 expected = []
 for i in range(len(freq)):
 	expected.append(expected_value(bins[i] + bin_diff, bins[i], waiting_time_rate))
-	
-print expected
-print sum(expected)
-print len(freq)
 
+print "Mean Waiting Time: " + str(1.0/waiting_time_rate)
 chi_square(freq.tolist(), expected)
+
+
+plt.hist(occupancy, num_bins)
+plt.xlabel("PACKET OCCUPANCY OF SYSTEM ON NEW ARRIVAL")
+plt.ylabel("FREQUENCY OF OCCUPANCY")
+plt.title("System Occupancy")
+plt.show()
 
 plt.hist(waiting_time, 32)
 plt.xlabel("WAITING TIME OF PACKET")
